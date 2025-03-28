@@ -3,21 +3,21 @@
 require "etc"
 
 $root = Pathname.new(__FILE__).dirname.realpath
-$lib = $root / "lib"
+$lib = $root / "lib_csc"
 
 require "ruby-progressbar"
 require "yard"
 require "minitest/test_task"
 
-require_relative $root / "lib" / "architecture"
-require_relative $root / "lib" / "design"
-require_relative $root / "lib" / "portfolio_design"
-require_relative $root / "lib" / "proc_cert_design"
+require_relative $root / "lib_csc" / "architecture"
+require_relative $root / "lib_csc" / "design"
+require_relative $root / "lib_csc" / "portfolio_design"
+require_relative $root / "lib_csc" / "proc_cert_design"
 
 directory "#{$root}/.stamps"
 
-# Load and execute Rakefile for each backend.
-Dir.glob("#{$root}/backends/*/tasks.rake") do |rakefile|
+# Load and execute rakefile for each CSC backend.
+Dir.glob("#{$root}/backends_csc/*/tasks.rake") do |rakefile|
   load rakefile
 end
 
@@ -56,7 +56,7 @@ namespace :gen do
 
   desc "Resolve the standard in arch/, and write it to resolved_arch/"
   task "resolved_arch" do
-    sh "#{$root}/.home/.venv/bin/python3 lib/yaml_resolver.py resolve arch resolved_arch"
+    sh "#{$root}/.home/.venv/bin/python3 lib_csc/yaml_resolver.py resolve arch resolved_arch"
   end
 end
 
@@ -67,12 +67,12 @@ rule %r{#{$root}/.stamps/resolve-.+\.stamp} => proc { |tname|
   overlay_files = Dir.glob("#{$root}/cfgs/#{cfg_name}/arch_overlay/**/*.yaml")
   [
     "#{$root}/.stamps",
-    "#{$root}/lib/yaml_resolver.py"
+    "#{$root}/lib_csc/yaml_resolver.py"
   ] + arch_files + overlay_files
 } do |t|
   cfg_name = File.basename(t.name, ".stamp").sub("resolve-", "")
-  sh "#{$root}/.home/.venv/bin/python3 lib/yaml_resolver.py merge arch cfgs/#{cfg_name}/arch_overlay gen/arch/#{cfg_name}"
-  sh "#{$root}/.home/.venv/bin/python3 lib/yaml_resolver.py resolve gen/arch/#{cfg_name} gen/resolved_arch/#{cfg_name}"
+  sh "#{$root}/.home/.venv/bin/python3 lib_csc/yaml_resolver.py merge arch cfgs/#{cfg_name}/arch_overlay gen/arch/#{cfg_name}"
+  sh "#{$root}/.home/.venv/bin/python3 lib_csc/yaml_resolver.py resolve gen/arch/#{cfg_name} gen/resolved_arch/#{cfg_name}"
 
   FileUtils.touch t.name
 end
@@ -296,12 +296,14 @@ end
 
 namespace :test do
   desc <<~DESC
-    Run smoke tests
+    Run CSC smoke tests
 
     These are basic but fast-running tests to check the database and tools
   DESC
-  task :smoke do
-    puts "UPDATE: Starting test:smoke"
+  task :smoke_csc do
+    puts "UPDATE: Starting test:smoke_csc"
+    puts "UPDATE: Running gen:isa_explorer_spreadsheet"
+    Rake::Task["gen:isa_explorer_spreadsheet"].invoke
     puts "UPDATE: Running test:idl_compiler"
     Rake::Task["test:idl_compiler"].invoke
     puts "UPDATE: Running test:lib"
@@ -314,39 +316,112 @@ namespace :test do
   end
 
   desc <<~DESC
-    Run the regression tests
+    Run the CSC regression tests
 
     These tests must pass before a commit will be allowed in the main branch on GitHub
   DESC
-  task :regress do
-    puts "UPDATE: Starting test:regress"
-    Rake::Task["test:smoke"].invoke
+  task :regress_csc do
+    puts "UPDATE: Starting test:regress_csc"
+    Rake::Task["test:smoke_csc"].invoke
 
-    puts "UPDATE: Running gen:html_manual MANUAL_NAME=isa VERSIONS=all"
-    ENV["MANUAL_NAME"] = "isa"
-    ENV["VERSIONS"] = "all"
-    Rake::Task["gen:html_manual"].invoke
+    puts "UPDATE: Running gen:isa_explorer_browser"
+    Rake::Task["gen:isa_explorer_browser"].invoke
 
-    puts "UPDATE: Running gen:ext_pdf EXT=B VERSION=latest"
-    ENV["EXT"] = "B"
-    ENV["VERSION"] = "latest"
-    Rake::Task["gen:ext_pdf"].invoke
+    puts "UPDATE: Generating MockProcessor-CRD.pdf"
+    Rake::Task["#{$root}/gen/proc_crd/pdf/MockProcessor-CRD.pdf"].invoke
 
-    puts "UPDATE: Running gen:html for generic_rv64"
-    Rake::Task["gen:html"].invoke("generic_rv64")
+    puts "UPDATE: Generating MockProcessor-CTP.pdf"
+    Rake::Task["#{$root}/gen/proc_ctp/pdf/MockProcessor-CTP.pdf"].invoke
 
-    puts "UPDATE: Done test:regress"
-    puts "Regression test PASSED"
+    puts "UPDATE: Generating MockProfileRelease.pdf"
+    Rake::Task["#{$root}/gen/profile/pdf/MockProfileRelease.pdf"].invoke
+
+    puts "UPDATE: Done test:regress_csc"
+    puts "CSC regression test PASSED"
   end
 
   desc <<~DESC
-    Run the nightly regression tests
+    Run the CSC nightly regression tests
 
     Generally, this tries to build all artifacts
   DESC
-  task :nightly do
-    Rake::Task["test:regress"].invoke
+  task :nightly_csc do
+    Rake::Task["test:regress_csc"].invoke
+    Rake::Task["portfolios"].invoke
     puts
-    puts "Nightly regression test PASSED"
+    puts "Nightly CSC regression test PASSED"
   end
 end
+
+desc <<~DESC
+  Generate all portfolio-based PDF artifacts (certificates and profiles)
+DESC
+task :portfolios do
+  portfolio_start_msg("MockProcessor-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MockProcessor-CRD.pdf"].invoke
+  portfolio_start_msg("MockProcessor-CTP")
+  Rake::Task["#{$root}/gen/proc_ctp/pdf/MockProcessor-CTP.pdf"].invoke
+  portfolio_start_msg("MockProfileRelease")
+  Rake::Task["#{$root}/gen/profile/pdf/MockProfileRelease.pdf"].invoke
+  portfolio_start_msg("MC100-32-CTP")
+  Rake::Task["#{$root}/gen/proc_ctp/pdf/MC100-32-CTP.pdf"].invoke
+  portfolio_start_msg("MC100-32-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MC100-32-CRD.pdf"].invoke
+  portfolio_start_msg("MC100-64-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MC100-64-CRD.pdf"].invoke
+  portfolio_start_msg("MC200-32-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MC200-32-CRD.pdf"].invoke
+  portfolio_start_msg("MC200-64-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MC200-64-CRD.pdf"].invoke
+  portfolio_start_msg("MC300-32-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MC300-32-CRD.pdf"].invoke
+  portfolio_start_msg("MC300-64-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/MC300-64-CRD.pdf"].invoke
+  portfolio_start_msg("AC100-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/AC100-CRD.pdf"].invoke
+  portfolio_start_msg("AC200-CRD")
+  Rake::Task["#{$root}/gen/proc_crd/pdf/AC200-CRD.pdf"].invoke
+  portfolio_start_msg("RVI20ProfileRelease")
+  Rake::Task["#{$root}/gen/profile/pdf/RVI20ProfileRelease.pdf"].invoke
+  portfolio_start_msg("RVA20ProfileRelease")
+  Rake::Task["#{$root}/gen/profile/pdf/RVA20ProfileRelease.pdf"].invoke
+  portfolio_start_msg("RVA22ProfileRelease")
+  Rake::Task["#{$root}/gen/profile/pdf/RVA22ProfileRelease.pdf"].invoke
+  portfolio_start_msg("RVA23ProfileRelease")
+  Rake::Task["#{$root}/gen/profile/pdf/RVA23ProfileRelease.pdf"].invoke
+  portfolio_start_msg("RVB23ProfileRelease")
+  Rake::Task["#{$root}/gen/profile/pdf/RVB23ProfileRelease.pdf"].invoke
+end
+
+def portfolio_start_msg(name)
+  puts ""
+  puts "================================================================================================="
+  puts "#{name}"
+  puts "================================================================================================="
+  puts ""
+end
+
+# Shortcut targets for building CRDs, CTPs, and Profile Releases.
+task "MockCRD": "#{$root}/gen/proc_crd/pdf/MockProcessor-CRD.pdf"
+task "MockProcessorCRD": "#{$root}/gen/proc_crd/pdf/MockProcessor-CRD.pdf"
+task "MockCTP": "#{$root}/gen/proc_ctp/pdf/MockProcessor-CTP.pdf"
+task "MockProcessorCTP": "#{$root}/gen/proc_ctp/pdf/MockProcessor-CTP.pdf"
+task "MockCTP-HTML": "#{$root}/gen/proc_ctp/pdf/MockProcessor-CTP.html"
+task "MockProcessorCTP-HTML": "#{$root}/gen/proc_ctp/pdf/MockProcessor-CTP.html"
+task "MC100-32-CTP": "#{$root}/gen/proc_ctp/pdf/MC100-32-CTP.pdf"
+task "MC100-32-CTP-HTML": "#{$root}/gen/proc_ctp/pdf/MC100-32-CTP.html"
+task "MC100-32-CRD": "#{$root}/gen/proc_crd/pdf/MC100-32-CRD.pdf"
+task "MC100-64-CRD": "#{$root}/gen/proc_crd/pdf/MC100-64-CRD.pdf"
+task "MC200-32-CRD": "#{$root}/gen/proc_crd/pdf/MC200-32-CRD.pdf"
+task "MC200-64-CRD": "#{$root}/gen/proc_crd/pdf/MC200-64-CRD.pdf"
+task "MC300-32-CRD": "#{$root}/gen/proc_crd/pdf/MC300-32-CRD.pdf"
+task "MC300-64-CRD": "#{$root}/gen/proc_crd/pdf/MC300-64-CRD.pdf"
+task "AC100-CRD": "#{$root}/gen/proc_crd/pdf/AC100-CRD.pdf"
+task "AC200-CRD": "#{$root}/gen/proc_crd/pdf/AC200-CRD.pdf"
+task "MockProfile": "#{$root}/gen/profile/pdf/MockProfileRelease.pdf"
+task "MockProfileRelease": "#{$root}/gen/profile/pdf/MockProfileRelease.pdf"
+task "RVI20": "#{$root}/gen/profile/pdf/RVI20ProfileRelease.pdf"
+task "RVA20": "#{$root}/gen/profile/pdf/RVA20ProfileRelease.pdf"
+task "RVA22": "#{$root}/gen/profile/pdf/RVA22ProfileRelease.pdf"
+task "RVA23": "#{$root}/gen/profile/pdf/RVA23ProfileRelease.pdf"
+task "RVB23": "#{$root}/gen/profile/pdf/RVB23ProfileRelease.pdf"

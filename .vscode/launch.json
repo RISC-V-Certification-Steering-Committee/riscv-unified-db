@@ -5,7 +5,7 @@
       "type": "rdbg",
       "name": "MC100-32-CRD",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_crd_pdf[MC100-32]",
       "args": [],
       "askParameters": false
@@ -14,7 +14,7 @@
       "type": "rdbg",
       "name": "MC100-32-CTP",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_ctp_pdf[MC100-32]",
       "args": [],
       "askParameters": false
@@ -23,7 +23,7 @@
       "type": "rdbg",
       "name": "MC200-32-CRD",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_crd_pdf[MC200-32]",
       "args": [],
       "askParameters": false
@@ -32,7 +32,7 @@
       "type": "rdbg",
       "name": "AC100-CRD",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_crd_pdf[AC100]",
       "args": [],
       "askParameters": false
@@ -41,7 +41,7 @@
       "type": "rdbg",
       "name": "AC200-CRD",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_crd_pdf[AC200]",
       "args": [],
       "askParameters": false
@@ -50,7 +50,7 @@
       "type": "rdbg",
       "name": "MockCRD",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_crd_pdf[MockProcessor]",
       "args": [],
       "askParameters": false
@@ -59,7 +59,7 @@
       "type": "rdbg",
       "name": "MockCTP",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:proc_ctp_pdf[MockProcessor]",
       "args": [],
       "askParameters": false
@@ -68,7 +68,7 @@
       "type": "rdbg",
       "name": "portfolios",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "portfolios",
       "args": [],
       "askParameters": false
@@ -77,7 +77,7 @@
       "type": "rdbg",
       "name": "MockProfile",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:profile_release_pdf[Mock]",
       "args": [],
       "askParameters": false
@@ -86,7 +86,7 @@
       "type": "rdbg",
       "name": "RVA20",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:profile_release_pdf[RVA20]",
       "args": [],
       "askParameters": false
@@ -95,7 +95,7 @@
       "type": "rdbg",
       "name": "ISA Explorer Browser Generator",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:isa_explorer_browser",
       "args": [],
       "askParameters": false
@@ -118,7 +118,7 @@
       "type": "rdbg",
       "name": "ISA Explorer Spreadsheet Generator",
       "request": "launch",
-      "command": "bundle exec rake",
+      "command": "bundle exec rake --rakefile=Rakefile_csc",
       "script": "gen:isa_explorer_spreadsheet",
       "args": [],
       "askParameters": false

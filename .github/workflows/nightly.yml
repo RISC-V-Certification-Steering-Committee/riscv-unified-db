@@ -54,3 +54,5 @@ jobs:
         run: ./bin/setup
       - name: Run regression
         run: ./do test:nightly
+      - name: Run CSC regression
+        run: ./do test:nightly_csc

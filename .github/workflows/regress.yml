@@ -46,6 +46,8 @@ jobs:
         run: ./bin/setup
       - name: Run smoke
         run: ./do test:smoke
+      - name: Run smoke_csc
+        run: ./do test:smoke_csc
   regress-gen-isa-manual:
     runs-on: ubuntu-latest
     env:
