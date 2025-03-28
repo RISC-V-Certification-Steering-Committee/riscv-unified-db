@@ -20,7 +20,7 @@ rakefile_name=
 
 for arg; do
   case "$arg" in
-    *isa_explorer | *proc_crd* | *proc_ctp* | *profile* | *Profile* | RVI* | RVA* | RVB* | RVM* | *csc*)
+    *isa_explorer* | *proc_crd* | *proc_ctp* | *profile* | *Profile* | RVI* | RVA* | RVB* | RVM* | *csc*)
       [ "$arg" == "--tasks_csc" ] && {
         arg="--tasks"
       }
