@@ -13,6 +13,7 @@ if [ "$1" == "clean" ]; then
   exit $?
 fi
 
+
 source $ROOT/bin/setup
 
 rakefile_name=

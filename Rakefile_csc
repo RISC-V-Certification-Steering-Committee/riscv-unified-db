@@ -13,6 +13,7 @@ require_relative $root / "lib_csc" / "architecture"
 require_relative $root / "lib_csc" / "design"
 require_relative $root / "lib_csc" / "portfolio_design"
 require_relative $root / "lib_csc" / "proc_cert_design"
+require_relative $root / "lib_csc" / "cfg_arch"
 
 directory "#{$root}/.stamps"
 
@@ -96,18 +97,18 @@ namespace :serve do
 end
 
 namespace :test do
-  # "Run the IDL compiler test suite"
-  task :idl_compiler do
+  # "Run the CSC IDL compiler test suite"
+  task :idl_compiler_csc do
     t = Minitest::TestTask.new(:lib_test)
-    t.test_globs = ["#{$root}/lib/idl/tests/test_*.rb"]
+    t.test_globs = ["#{$root}/lib_csc/idl/tests/test_*.rb"]
     t.process_env
     ruby t.make_test_cmd
   end
 
-  # "Run the Ruby library test suite"
-  task :lib do
+  # "Run the Ruby library CSC test suite"
+  task :lib_csc do
     t = Minitest::TestTask.new(:lib_test)
-    t.test_globs = ["#{$root}/lib/test/test_*.rb"]
+    t.test_globs = ["#{$root}/lib_csc/test/test_*.rb"]
     t.process_env
     ruby t.make_test_cmd
   end
@@ -132,20 +133,20 @@ namespace :test do
     Architecture.new("RISC-V Architecture", "#{$root}/resolved_arch").validate(show_progress: true)
     puts "All files validate against their schema"
   end
-  task idl: ["gen:resolved_arch", "#{$root}/.stamps/resolve-rv32.stamp", "#{$root}/.stamps/resolve-rv64.stamp"]  do
-    print "Parsing IDL code for RV32..."
+  task idl_csc: ["gen:resolved_arch", "#{$root}/.stamps/resolve-rv32.stamp", "#{$root}/.stamps/resolve-rv64.stamp"]  do
+    print "Parsing CSC IDL code for RV32..."
     cfg_arch32 = cfg_arch_for("rv32")
     puts "done"
 
     cfg_arch32.type_check
 
-    print "Parsing IDL code for RV64..."
+    print "Parsing CSC IDL code for RV64..."
     cfg_arch64 = cfg_arch_for("rv64")
     puts "done"
 
     cfg_arch64.type_check
 
-    puts "All IDL passed type checking"
+    puts "All CSC IDL passed type checking"
   end
 end
 
@@ -304,15 +305,15 @@ namespace :test do
     puts "UPDATE: Starting test:smoke_csc"
     puts "UPDATE: Running gen:isa_explorer_spreadsheet"
     Rake::Task["gen:isa_explorer_spreadsheet"].invoke
-    puts "UPDATE: Running test:idl_compiler"
-    Rake::Task["test:idl_compiler"].invoke
-    puts "UPDATE: Running test:lib"
-    Rake::Task["test:lib"].invoke
+    puts "UPDATE: Running test:idl_compiler_csc"
+    Rake::Task["test:idl_compiler_csc"].invoke
+    puts "UPDATE: Running test:lib_csc"
+    Rake::Task["test:lib_csc"].invoke
     puts "UPDATE: Running test:schema"
     Rake::Task["test:schema"].invoke
-    puts "UPDATE: Running test:idl"
-    Rake::Task["test:idl"].invoke
-    puts "UPDATE: Done test:smoke"
+    puts "UPDATE: Running test:idl_csc"
+    Rake::Task["test:idl_csc"].invoke
+    puts "UPDATE: Done test:smoke_csc"
   end
 
   desc <<~DESC
