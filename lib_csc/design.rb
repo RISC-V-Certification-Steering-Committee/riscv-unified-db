@@ -24,12 +24,12 @@ require "tilt"
 require_relative "idesign"
 require_relative "architecture"
 
-require_relative "idl"
-require_relative "idl/passes/find_return_values"
-require_relative "idl/passes/gen_adoc"
-require_relative "idl/passes/prune"
-require_relative "idl/passes/reachable_exceptions"
-require_relative "idl/passes/reachable_functions"
+require_relative "../lib/idl"
+require_relative "../lib/idl/passes/find_return_values"
+require_relative "../lib/idl/passes/gen_adoc"
+require_relative "../lib/idl/passes/prune"
+require_relative "../lib/idl/passes/reachable_exceptions"
+require_relative "../lib/idl/passes/reachable_functions"
 
 require_relative "backend_helpers"
 

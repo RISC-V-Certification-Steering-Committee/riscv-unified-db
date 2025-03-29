@@ -1,6 +1,6 @@
 #frozen_string_literal: true
 
-require_relative "../idl/type"
+require_relative "../../lib/idl/type"
 
 # represents a JSON Schema
 #

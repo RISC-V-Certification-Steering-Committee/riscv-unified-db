@@ -1,4 +1,4 @@
-require_relative "../ast"
+require_relative "../../../lib/passes/ast"
 
 module Idl
   class AstNode

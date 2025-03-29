@@ -1,4 +1,4 @@
-require_relative "../ast"
+require_relative "../../../lib/idl/ast"
 
 class Idl::AstNode
   def gen_adoc(indent = 0, indent_spaces: 2)

@@ -27,14 +27,16 @@ module Treetop
   end
 end
 
-require_relative "idl/ast"
-require_relative "idl/symbol_table"
+require_relative "../lib/idl/ast"
+require_relative "../lib/idl/symbol_table"
 
-Treetop.load(($root / "lib_csc" / "idl" / "idl").to_s)
+Treetop.load(($root / "lib" / "idl" / "idl").to_s)
 
 module Idl
   # the Idl compiler
   class Compiler
+    attr_reader :parser
+
     def initialize
       @parser = IdlParser.new
     end

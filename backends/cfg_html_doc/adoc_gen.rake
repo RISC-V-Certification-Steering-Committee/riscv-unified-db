@@ -8,7 +8,6 @@ require "ruby-prof"
     [
       "#{CFG_HTML_DOC_DIR}/templates/#{type}.adoc.erb",
       "#{$root}/lib/cfg_arch.rb",
-      "#{$root}/lib/design.rb",
       "#{$root}/lib/idl/passes/gen_adoc.rb",
       __FILE__,
       "#{$root}/.stamps"
@@ -30,29 +29,29 @@ require "ruby-prof"
       cfg_arch.transitive_implemented_csrs.each do |csr|
         path = dir_path / "#{csr.name}.adoc"
         puts "  Generating #{path}"
-        File.write(path, cfg_arch.convert_monospace_to_links(erb.result(binding)))
+        File.write(path, cfg_arch.find_replace_links(erb.result(binding)))
       end
     when "inst"
       cfg_arch.transitive_implemented_instructions.each do |inst|
         path = dir_path / "#{inst.name}.adoc"
         puts "  Generating #{path}"
         # RubyProf.start
-        File.write(path, cfg_arch.convert_monospace_to_links(erb.result(binding)))
+        File.write(path, cfg_arch.find_replace_links(erb.result(binding)))
         # result = RubyProf.stop
         # RubyProf::FlatPrinter.new(result).print(STDOUT)
       end
     when "ext"
-      cfg_arch.transitive_implemented_ext_vers.each do |ext_version|
-        ext = cfg_arch.arch.extension(ext_version.name)
+      cfg_arch.transitive_implemented_extension_versions.each do |ext_version|
+        ext = cfg_arch.extension(ext_version.name)
         path = dir_path / "#{ext.name}.adoc"
         puts "  Generating #{path}"
-        File.write(path, cfg_arch.convert_monospace_to_links(erb.result(binding)))
+        File.write(path, cfg_arch.find_replace_links(erb.result(binding)))
       end
     when "func"
       global_symtab = cfg_arch.symtab
       path = dir_path / "funcs.adoc"
       puts "  Generating #{path}"
-      File.write(path, cfg_arch.convert_monospace_to_links(erb.result(binding)))
+      File.write(path, cfg_arch.find_replace_links(erb.result(binding)))
     else
       raise "todo"
     end
@@ -89,8 +88,8 @@ require "ruby-prof"
         lines << " * `#{csr.name}` #{csr.long_name}"
       end
     when "ext"
-      puts "Generting full extension list"
-      cfg_arch.transitive_implemented_ext_vers.each do |ext_version|
+      puts "Generating full extension list"
+      cfg_arch.transitive_implemented_extension_versions.each do |ext_version|
         lines << " * `#{ext_version.name}` #{ext_version.ext.long_name}"
       end
     when "inst"
@@ -107,7 +106,7 @@ require "ruby-prof"
       raise "Unsupported type"
     end
 
-    File.write t.name, cfg_arch.convert_monospace_to_links(lines.join("\n"))
+    File.write t.name, cfg_arch.find_replace_links(lines.join("\n"))
   end
 end
 
@@ -129,7 +128,7 @@ end
 namespace :gen do
   desc "Generate Asciidoc source for config into gen/CONFIG_NAME/adoc"
   task :adoc, [:config_name] do |_t, args|
-    raise "No config named #{args[:config_name]}" unless File.directory?($root / "cfgs" / args[:config_name])
+    raise "No config named #{args[:config_name]}" unless File.file?($root / "cfgs" / "#{args[:config_name]}.yaml")
 
     ["inst", "csr", "ext", "func"].each do |type|
       Rake::Task["#{$root}/.stamps/adoc-gen-#{type}s-#{args[:config_name]}.stamp"].invoke

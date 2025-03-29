@@ -110,7 +110,10 @@ class Architecture
       @objects[arch_dir] = []
       @object_hashes[arch_dir] = {}
       Dir.glob(@arch_dir / arch_dir / "**" / "*.yaml") do |obj_path|
-        obj_yaml = YAML.load_file(obj_path, permitted_classes: [Date])
+        f = File.open(obj_path)
+        f.flock(File::LOCK_EX)
+        obj_yaml = YAML.load(f.read, filename: obj_path, permitted_classes: [Date])
+        f.flock(File::LOCK_UN)
         @objects[arch_dir] << obj_class.new(obj_yaml, Pathname.new(obj_path).realpath, self)
         @object_hashes[arch_dir][@objects[arch_dir].last.name] = @objects[arch_dir].last
       end

@@ -5,7 +5,7 @@
 # It adds a `prune` function to every AstNode that returns a new,
 # pruned subtree.
 
-require_relative "../ast"
+require_relative "../../../lib/passes/ast"
 
 def create_int_literal(value)
   str = value <= 512 ? value.to_s : "0x#{value.to_s(16)}"

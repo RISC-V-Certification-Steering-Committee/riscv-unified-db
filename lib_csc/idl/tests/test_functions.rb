@@ -2,7 +2,7 @@ require "minitest/autorun"
 
 $root ||= (Pathname.new(__FILE__) / ".." / ".." / ".." / "..").realpath
 
-require_relative "../../idl"
+require_relative "../../../lib/idl"
 require_relative "../passes/reachable_exceptions"
 require_relative "helpers"
 

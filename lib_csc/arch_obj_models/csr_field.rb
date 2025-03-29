@@ -2,7 +2,7 @@
 
 require_relative "database_obj"
 
-require_relative "../idl/passes/gen_option_adoc"
+require_relative "../../lib/idl/passes/gen_option_adoc"
 
 # A CSR field object
 class CsrField < DatabaseObject
